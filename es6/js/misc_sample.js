@@ -44,7 +44,77 @@ function destructuringSample() {
   
   var {foo: {bar: [, x]}} = { foo: { bar: [1, 2, 3] } };
   console.log(x);
+  
+  // 変数への分割代入
+  var regex = /(\d{4})(\d{2})(\d{2})/;
+  var date = regex.exec("20151231");
+  var year = date[1];
+  var month = date[2];
+  var day = date[3];
+  console.log(year, month, day);
+  // ES6 １行で代入
+  var [, year, month, day] = regex.exec("20150720");
+  console.log(year, month, day);
+  
+  // 関数引数 オブジェクトリテラルのように書くと、分割代入される
+  (({a, b}) => console.log(a, b))({ a: 1, b: 2 });
+  // デフォルトパラメータ
+  //(({a = 0, b = 0} = {}) => console.log(a, b))({});
+  (([a, b]) => console.log(a, b))([1 ,4]);
+  //(([a, b] = []) => console.log(a, b))([1, 4]);
+  
+  // 配列で返却して、個別変数に代入
+  var [x, y] = (() => [0, 1])();
+  console.log(x, y);
+  
+  console.log("destructuring... end.");
+
 }
+
+function interatorSample() {
+  console.log("iterator...");
+  var arr = [1, 2, 3];
+  for (var i = 0; i < arr.length; i++) {
+    console.log(arr[i]);
+  }
+  
+  // for/of文
+  var iter = [1, 2, 3];
+  for (let n of iter) {
+    console.log(n);
+  }
+  
+  var chars = [];
+  for (let n of "foo") {
+    chars.push(n);
+  }
+  console.log(chars);
+  
+  // スプレッドオペラータと分割代入
+  var arr2 = [..."foo"];
+  console.log(arr2);
+  // 分割代入
+  var [c1, c2, ...rest] = "ecma";
+  console.log(c1, c2, rest);
+  
+  // IterableとIterator
+  var arr3 = ["foo", "bar"];
+  // IterableからIteratorを取得
+  var iterator = arr3[Symbol.iterator]();
+  // Iteratorから要素を取得
+  console.log(iterator.next());
+  console.log(iterator.next());
+  console.log(iterator.next());
+  console.log(iterator.next());
+ 
+  console.log("iterator... end.");
+  
+}
+
+// まだサポートされていない
+// function foo({a = 0, b = 0} = {}) {
+//   console.log(a, b);
+// }
 
 function spreadOperatorSample() {
 
@@ -111,22 +181,30 @@ function shortHandPropertySample() {
   console.log(o.a); // "foo"
 }
 
-// function taggedTemplateSample() {
-//   var name = "Bob <script>";
-//   el.innerHTML = html`<p>Hello, ${name}</p>`;
-// }
-// // タグ関数
-// function html(templates, ...values){
+function taggedTemplateSample() {
+  console.log("taggedTemplate ...");
+  var name = "Bob <script>";
+  var el = {innerHTML:""};
+  el.innerHTML = html`<p>Hello, ${name}</p>`;
+  console.log(el.innerHTML);
+  console.log("taggedTemplate ... end.");
+}
+// タグ関数
+function html(templates, ...values){
   
-//   var result = "";
-//   for (let i = 0; i < templates.length; i++) {
-//     result += templates[i];
-//     if (i < values.length) {
-//       result += escapeHtml(values[i]);
-//     }
-//   }
-//   return result;
-// }
+  var result = "";
+  for (let i = 0; i < templates.length; i++) {
+    result += templates[i];
+    if (i < values.length) {
+      result += escapeHtml(values[i]);
+    }
+  }
+  return result;
+}
+
+function escapeHtml(str) {
+  return "escaped:" + str;
+}
 
 function unicodeCodePointSample() {
   // 𩸽はサロゲートペアを使う
@@ -202,12 +280,12 @@ function arraySample() {
   // Int32Array [4, 2, 3, 4, 5]
 }
 
-function objectSample(){
+function objectSample() {
   // Object.assign
   console.log("Object.assign");
-  var target = {a: 1, b: 2};
-  var s1 = {b: 3, c: 4};
-  var s2 = {c: 5, d: 6};
+  var target = { a: 1, b: 2 };
+  var s1 = { b: 3, c: 4 };
+  var s2 = { c: 5, d: 6 };
   var ret = Object.assign(target, s1, s2);
   // s1, s2の順なら、後続のs2で上書きされる
   console.log(target);
@@ -220,7 +298,7 @@ function objectSample(){
   console.log(s1); // s1.bは元の値のまま
   
   // sharrow copy（ネストしたオブジェクトに対しては、参照のコピーになる）
-  var s3 = {x: {y: 1}};
+  var s3 = { x: { y: 1 } };
   var clone3 = Object.assign({}, s3);
   clone3.x.y = 2;
   console.log(s3.x.y);
@@ -228,15 +306,15 @@ function objectSample(){
   // Object.is
   console.log("Object.is");
   // 通常の比較は===と同じ
-  console.log(Object.is(1,1)); // true
-  console.log(Object.is({},{})); // false
+  console.log(Object.is(1, 1)); // true
+  console.log(Object.is({}, {})); // false
   var a = {};
-  console.log(Object.is(a,a)); // true
+  console.log(Object.is(a, a)); // true
   // NaN同士の比較はtrue
-  console.log(Object.is(NaN,NaN)); // true
+  console.log(Object.is(NaN, NaN)); // true
   console.log(NaN === NaN); // false
   // -0と+0の比較はfalse
-  console.log(Object.is(-0,+0)); // false
+  console.log(Object.is(-0, +0)); // false
   console.log(-0 === +0); // true
   
   // 利用例：NaNを探す
@@ -248,7 +326,7 @@ function mathAndNumberSample() {
   console.log("Math And Number ...");
   console.log(0b10);
   console.log(0b100);
-  
+
   console.log(0o10);
   console.log(0o100);
 
@@ -275,7 +353,7 @@ function mathAndNumberSample() {
 }
 
 function symbolSample() {
-  console.log("Symbol ...")
+  console.log("Symbol ...");
   
   // Symbolの生成
   var sym1 = Symbol();
@@ -283,9 +361,48 @@ function symbolSample() {
   // 説明をつけることもできる
   var sym2 = Symbol("foo");
   console.log(sym2.toString()); // "Symbol(foo)"
-  // Symbolは必ずユニーク
+  // Symbolは必ずユニークのため、同値比較は必ずfalse
   console.log(sym2 === Symbol("foo"));
   
+  // Symbolをキーに持つオブジェクト
+  var obj = { [sym2]: 1 };
+  // obj.keysで列挙されない
+  console.log(Object.keys(obj)); // []
+  // 下記で列挙
+  console.log(Object.getOwnPropertySymbols(obj));
+  console.log(obj[sym2]);
+  
+  // well-known symbol（まだ対応していない？）
+  var obj2 = {
+    [Symbol.toStringTag]: "Foo!"
+  }
+  console.log(String(obj2));
+}
+
+function typedArraySample() {
+  console.log("Typed Array ...");
+  
+  // 型付配列：バイナリデータを効率的に扱うためのデータ型
+  // メモリ領域：ArrayBuffer
+  // インターフェース（ビュー）：TypedArray, DataView
+  
+  // 符号なし16ビット整数配列でサイズは2
+  var u16 = new Uint16Array(2);
+  console.log(u16.byteLength);
+  u16[0] = 0x00ff;
+  u16[1] = 0xffff;
+  console.log(u16); // 255, 65535
+  
+  // 符号なし8ビット整数配列のビューに変換
+  var u8 = new Uint8Array(u16.buffer);
+  console.log(u8.byteLength);
+  console.log(u8);
+  
+  // DataViewに変換
+  var view = new DataView(u8.buffer);
+  // 先頭8ビットに値を符号なし整数を設定
+  view.setUint8(0, 0x0f);
+  console.log(u8);
 }
 
 function execMiscSample() {
@@ -298,6 +415,8 @@ function execMiscSample() {
   console.log(addWithDefault());
 
   destructuringSample();
+  
+  interatorSample();
 
   spreadOperatorSample();
 
@@ -307,17 +426,19 @@ function execMiscSample() {
 
   shortHandPropertySample();
   
-  // taggedTemplateSample();
+  taggedTemplateSample();
   
   unicodeCodePointSample();
 
   stringSample();
 
   arraySample("arg1", "arg2");
-  
+
   objectSample();
-  
+
   mathAndNumberSample();
-  
+
   symbolSample();
+
+  typedArraySample();
 }
